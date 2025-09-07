@@ -42,8 +42,9 @@
             background-image: url('waves.png');
             background-size: calc(5000px * var(--bg-scale)) calc(3333px * var(--bg-scale));
             background-repeat: repeat;
-            opacity: 0.30;
+            opacity: 0.20;
             z-index: -1;
+            mix-blend-mode: add;
             pointer-events: none;
             animation: scrollBackground 120s linear infinite;
             will-change: background-position; /* Better performance hint for this animation */
@@ -361,7 +362,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Set random animation delay for background
-            const randomDelay = Math.random() * -120; // Random delay between 0 and -120 seconds (negative = starts partway through)
+            const randomDelay = Math.random() * -120;
             document.querySelector('body::before') || document.documentElement.style.setProperty('--random-delay', `${randomDelay}s`);
             
             // Apply the delay to the background animation
@@ -372,7 +373,7 @@
                 }
                 @media (min-width: 768px) {
                     body::before {
-                        animation-delay: ${Math.random() * -600}s; /* Random delay for desktop's 10-minute cycle */
+                        animation-delay: ${Math.random() * -600}s;
                     }
                 }
             `;
@@ -417,18 +418,41 @@
 
             // Generate random hue (0-360), fixed saturation and lightness for OKHSL
             const randomHue = Math.floor(Math.random() * 360);
-            const saturation = 1.5; // 70% saturation in OKHSL
+            const saturation = 1.3; // 70% saturation in OKHSL
             const lightness = 0.3; // 35% lightness in OKHSL
             
             const [r, g, b] = okhslToRgb(randomHue, saturation, lightness);
             document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+
+            // Get image from letter folders with proper randomization (synchronous approach)
+            function getImageForLetter(letter, weeksDifference) {
+                // Default dummy images as fallback
+                const dummyImage = `https://dummyimage.com/1920x1080/222/fff&text=${letter}`;
+                
+                // For now, try to load the first image and fallback to dummy if it fails
+                // We'll use a simple approach that doesn't cause delays
+                const imageToTry = `/${letter}/1.png`;
+                
+                // Create a deterministic "random" value based on letter and week
+                const seed = `${letter}-week-${weeksDifference}`;
+                let seedValue = 0;
+                for (let i = 0; i < seed.length; i++) {
+                    seedValue = ((seedValue << 5) - seedValue) + seed.charCodeAt(i);
+                    seedValue = seedValue & seedValue; // Convert to 32bit integer
+                }
+                
+                // For now, assume max 5 images per folder and use modulo
+                const imageNumber = (Math.abs(seedValue) % 5) + 1;
+                
+                return `/${letter}/${imageNumber}.png`;
+            }
 
             // Original image assignments
             const images = {
                 F: "https://dummyimage.com/1920x1080/222/fff&text=F",
                 L: "https://dummyimage.com/1920x1080/222/fff&text=L", 
                 M: "https://dummyimage.com/1920x1080/222/fff&text=M",
-                P: "P/1.png",
+                P: "https://dummyimage.com/1920x1080/222/fff&text=P",
                 T: "https://dummyimage.com/1920x1080/222/fff&text=T"
             };
             
@@ -463,38 +487,56 @@
             const deserIndex = ((weeksDifference % deserRotation.length) + deserRotation.length) % deserRotation.length;
             const currentDeserLetter = deserRotation[deserIndex];
 
-            // Apply the current pattern
-            const imageElements = [
-                document.querySelector('.item:nth-of-type(1) .item-image'), // Łazienka
-                document.querySelector('.item:nth-of-type(2) .item-image'), // Pranie
-                document.querySelector('.item:nth-of-type(3) .item-image')  // Parter
-            ];
-            
-            // Set the images according to the pattern
-            for (let i = 0; i < 3; i++) {
-                imageElements[i].src = images[currentPattern[i]];
-                imageElements[i].alt = currentPattern[i];
-            }
-
-            // Set Deser image
-            const deserImage = document.querySelector('.special-item .item-image');
-            if (deserImage) {
-                deserImage.src = images[currentDeserLetter];
-                deserImage.alt = currentDeserLetter;
-            }
-
-            // Random rotation for images
-            const imageNodes = document.querySelectorAll('.item-image');
-            const isDesktop = window.innerWidth >= 768;
-
-            imageNodes.forEach(image => {
-                const randomRotation = Math.floor(Math.random() * 101) - 40; // -50 to 50 degrees
-                if (isDesktop) {
-                    image.style.transform = `translateY(-50%) rotate(${randomRotation}deg)`;
-                } else {
-                    image.style.transform = `rotate(${randomRotation}deg)`;
+            // Apply the current pattern with folder images (synchronous)
+            function applyImages() {
+                const imageElements = [
+                    document.querySelector('.item:nth-of-type(1) .item-image'), // Łazienka
+                    document.querySelector('.item:nth-of-type(2) .item-image'), // Pranie
+                    document.querySelector('.item:nth-of-type(3) .item-image')  // Parter
+                ];
+                
+                // Set the images according to the pattern
+                for (let i = 0; i < 3; i++) {
+                    const letter = currentPattern[i];
+                    const imageSrc = getImageForLetter(letter, weeksDifference);
+                    imageElements[i].src = imageSrc;
+                    imageElements[i].alt = letter;
+                    
+                    // Add error fallback
+                    imageElements[i].onerror = function() {
+                        this.src = images[letter];
+                    };
                 }
-            });
+
+                // Set Deser image
+                const deserImage = document.querySelector('.special-item .item-image');
+                if (deserImage) {
+                    const imageSrc = getImageForLetter(currentDeserLetter, weeksDifference);
+                    deserImage.src = imageSrc;
+                    deserImage.alt = currentDeserLetter;
+                    
+                    // Add error fallback
+                    deserImage.onerror = function() {
+                        this.src = images[currentDeserLetter];
+                    };
+                }
+
+                // Random rotation for images - apply immediately
+                const imageNodes = document.querySelectorAll('.item-image');
+                const isDesktop = window.innerWidth >= 768;
+
+                imageNodes.forEach(image => {
+                    const randomRotation = Math.floor(Math.random() * 101) - 40; // -50 to 50 degrees
+                    if (isDesktop) {
+                        image.style.transform = `translateY(-50%) rotate(${randomRotation}deg)`;
+                    } else {
+                        image.style.transform = `rotate(${randomRotation}deg)`;
+                    }
+                });
+            }
+            
+            // Apply the images immediately
+            applyImages();
             
             const optionalText = document.querySelector('.optional-text');
             if (optionalText.textContent.trim() !== '') {
