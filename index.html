@@ -36,23 +36,25 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 200%; /* Larger than viewport to ensure no blank spaces */
+            height: 200%;
             background-image: url('/waves.png');
             background-size: calc(5000px * var(--bg-scale)) calc(3333px * var(--bg-scale));
-            background-repeat: repeat-y; /* Tile vertically on mobile */
-            opacity: 0.15; /* Adjust transparency */
+            background-repeat: repeat; /* Tile in both directions to avoid blank spaces */
+            opacity: 0.15;
             z-index: -1;
-            animation: scrollBackground 120s linear infinite; /* 2 minutes per cycle */
             pointer-events: none;
+            animation: scrollBackground 120s linear infinite;
+            will-change: transform; /* Hint for browser to use GPU acceleration */
+            transform: translate3d(0, 0, 0); /* Initial position - force GPU acceleration */
         }
         
         @keyframes scrollBackground {
-            0% {
-                background-position: 0% 0%;
+            from {
+                transform: translate3d(0, 0, 0);
             }
-            100% {
-                background-position: -100% 100%;
+            to {
+                transform: translate3d(-50%, 50%, 0); /* Move from top-right to bottom-left */
             }
         }
         
@@ -279,6 +281,11 @@
             
             .optional-section {
                 top: 0; /* Reset top position for desktop */
+            }
+
+            /* Change background tiling for desktop but keep animation direction */
+            body::before {
+                background-size: calc(5000px * var(--bg-scale)) auto; /* Adjust for horizontal emphasis */
             }
         }
     </style>
