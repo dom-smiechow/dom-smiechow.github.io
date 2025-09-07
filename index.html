@@ -14,7 +14,7 @@
         }
         
         :root {
-            --bg-scale: 0.2; /* Controls the size of the background texture (0.2 = 20% of original size) */
+            --bg-scale: 0.3; /* Controls the size of the background texture (0.2 = 20% of original size) */
         }
         
         body {
@@ -42,7 +42,7 @@
             background-image: url('waves.png');
             background-size: calc(5000px * var(--bg-scale)) calc(3333px * var(--bg-scale));
             background-repeat: repeat;
-            opacity: 0.20;
+            opacity: 0.30;
             z-index: -1;
             pointer-events: none;
             animation: scrollBackground 120s linear infinite;
@@ -88,7 +88,7 @@
         
         .title-rectangle {
             position: absolute;
-            background-color: rgba(10, 10, 10, 0.97); /* Slightly more opaque */
+            background-color: rgba(20, 20, 20, 0.97); /* Darker */
             height: 130%; /* Bigger rectangle */
             width: 110%;  /* Wider rectangle */
             z-index: -1;
@@ -194,7 +194,7 @@
         
         .optional-rectangle {
             position: absolute;
-            background-color: rgba(10, 10, 10, 0.95);
+            background-color: rgba(20, 20, 20, 0.95); /* Darker */
             height: 100%;
             width: 100%;
             z-index: -1;
@@ -276,7 +276,8 @@
             }
             
             .optional-rectangle {
-                transform: rotate(1deg); /* rotate same amount but other way for desktop */
+                background-color: rgba(20, 20, 20, 0.95); /* Darker for desktop too */
+                transform: rotate(1deg);
             }
             
             .optional-section {
@@ -359,27 +360,54 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Generate random HSV color and apply to background
-            function hsvToRgb(h, s, v) {
-                const c = v * s;
-                const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-                const m = v - c;
-                let r, g, b;
-
-                if (h >= 0 && h < 60) {
-                    r = c; g = x; b = 0;
-                } else if (h >= 60 && h < 120) {
-                    r = x; g = c; b = 0;
-                } else if (h >= 120 && h < 180) {
-                    r = 0; g = c; b = x;
-                } else if (h >= 180 && h < 240) {
-                    r = 0; g = x; b = c;
-                } else if (h >= 240 && h < 300) {
-                    r = x; g = 0; b = c;
-                } else {
-                    r = c; g = 0; b = x;
+            // Set random animation delay for background
+            const randomDelay = Math.random() * -120; // Random delay between 0 and -120 seconds (negative = starts partway through)
+            document.querySelector('body::before') || document.documentElement.style.setProperty('--random-delay', `${randomDelay}s`);
+            
+            // Apply the delay to the background animation
+            const style = document.createElement('style');
+            style.textContent = `
+                body::before {
+                    animation-delay: ${randomDelay}s;
                 }
+                @media (min-width: 768px) {
+                    body::before {
+                        animation-delay: ${Math.random() * -600}s; /* Random delay for desktop's 10-minute cycle */
+                    }
+                }
+            `;
+            document.head.appendChild(style);
 
+            // Generate random OKHSL color and apply to background
+            function okhslToRgb(h, s, l) {
+                // Convert OKHSL to RGB
+                // This is a simplified approximation - for exact conversion you'd need the full OKHSL algorithm
+                // But this provides good enough results for random color generation
+                
+                // Normalize hue to 0-1 range
+                h = h / 360;
+                
+                // Convert to LCH-like space (approximation)
+                const chroma = s * l * (1 - Math.abs(2 * l - 1));
+                const hPrime = h * 6;
+                const x = chroma * (1 - Math.abs((hPrime % 2) - 1));
+                
+                let r, g, b;
+                if (hPrime >= 0 && hPrime < 1) {
+                    r = chroma; g = x; b = 0;
+                } else if (hPrime >= 1 && hPrime < 2) {
+                    r = x; g = chroma; b = 0;
+                } else if (hPrime >= 2 && hPrime < 3) {
+                    r = 0; g = chroma; b = x;
+                } else if (hPrime >= 3 && hPrime < 4) {
+                    r = 0; g = x; b = chroma;
+                } else if (hPrime >= 4 && hPrime < 5) {
+                    r = x; g = 0; b = chroma;
+                } else {
+                    r = chroma; g = 0; b = x;
+                }
+                
+                const m = l - chroma / 2;
                 return [
                     Math.round((r + m) * 255),
                     Math.round((g + m) * 255),
@@ -387,12 +415,12 @@
                 ];
             }
 
-            // Generate random hue (0-360), fixed saturation and brightness
+            // Generate random hue (0-360), fixed saturation and lightness for OKHSL
             const randomHue = Math.floor(Math.random() * 360);
-            const saturation = 0.60; // 80%
-            const brightness = 0.40; // 65%
+            const saturation = 1.5; // 70% saturation in OKHSL
+            const lightness = 0.3; // 35% lightness in OKHSL
             
-            const [r, g, b] = hsvToRgb(randomHue, saturation, brightness);
+            const [r, g, b] = okhslToRgb(randomHue, saturation, lightness);
             document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
 
             // Original image assignments
