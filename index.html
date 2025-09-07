@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dom Według Śmiechów</title>
+    <style>
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-scale: 0.2; /* Controls the size of the background texture (0.2 = 20% of original size) */
+        }
+        
+        body {
+            font-family: 'Futura', 'Montserrat', sans-serif;
+            background-color: #355C32; /* Cooler, darker green */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Background texture */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/waves.png');
+            background-size: calc(5000px * var(--bg-scale)) calc(3333px * var(--bg-scale));
+            background-repeat: repeat-y; /* Tile vertically on mobile */
+            opacity: 0.15; /* Adjust transparency */
+            z-index: -1;
+            animation: scrollBackground 120s linear infinite; /* 2 minutes per cycle */
+            pointer-events: none;
+        }
+        
+        @keyframes scrollBackground {
+            0% {
+                background-position: 0% 0%;
+            }
+            100% {
+                background-position: -100% 100%;
+            }
+        }
+        
+        /* Title section */
+        .title-container {
+            margin-bottom: 100px; /* Increased bottom margin */
+            text-align: center;
+            position: relative;
+            top: -10px; /* Move the title down a little bit (was -30px) */
+        }
+        
+        .mobile-title {
+            /* Add spacing between lines */
+            display: block;
+        }
+        .mobile-title .title-line {
+            margin-bottom: 32px; /* Increased gap between lines */
+        }
+        .mobile-title .title-line:last-child {
+            margin-bottom: 0;
+        }
+
+        .title-line {
+            display: block;
+            position: relative;
+            font-weight: 1000; /* Even bolder */
+            font-size: 2.8rem;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+        
+        .title-rectangle {
+            position: absolute;
+            background-color: rgba(10, 10, 10, 0.97); /* Slightly more opaque */
+            height: 130%; /* Bigger rectangle */
+            width: 110%;  /* Wider rectangle */
+            z-index: -1;
+            left: -5%;
+            top: -15%;
+        }
+        /* Adjusted rotation for title rectangles */
+        .mobile-title .title-line:first-child .title-rectangle {
+            transform: rotate(-1.3deg);
+        }
+        .mobile-title .title-line:last-child .title-rectangle {
+            width: 90%; /* Less wide for bottom line in mobile */
+            left: 5%;
+            transform: rotate(1.3deg); /* much less rotation */
+        }
+        .desktop-title .title-line .title-rectangle {
+            transform: rotate(-1deg); /* much less rotation */
+            width: 110%; /* Wider rectangle for desktop one-line */
+            left: -5%;
+        }
+        
+        .desktop-title {
+            display: none;
+        }
+        
+        /* Items section */
+        .items-container {
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            top: -60px; /* Move items section up even more */
+        }
+        
+        .item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px; /* Decreased vertical space between items */
+            position: relative;
+            min-height: 80px; /* Make items taller */
+        }
+        
+        .item-text {
+            font-weight: 800; /* More bold */
+            font-size: 2rem; /* Bigger text */
+            min-width: 140px;
+            text-align: left;      /* Align text to the left */
+            padding-left: 8px;    /* Reduced left padding */
+            padding-right: 0;      /* Remove right padding */
+        }
+        
+        .item-hyphen {
+            font-weight: 1000;
+            font-size: 2rem;
+            padding: 0 15px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            /* Only centering on mobile, desktop unchanged in media query below */
+        }
+        
+        .item-image {
+            width: 96px;
+            height: 96px;
+            margin-left: auto;
+            margin-right: 8px;
+            background: none; /* Remove previous background */
+            border: none;     /* Remove previous border */
+            display: block;
+        }
+        
+        /* Divider line */
+        .divider {
+            width: 75%; /* Reduced from 100% to 75% */
+            max-width: 375px; /* 75% of 500px */
+            height: 2px;
+            background-color: white;
+            margin: 15px auto; /* Center horizontally with auto margins */
+            position: relative;
+            top: -60px; /* Adjusted to center between elements on mobile */
+        }
+        
+        /* Special item (Deser) */
+        .special-item .item-text {
+            font-weight: 800; /* Even more bold but not as much as title */
+        }
+        
+        /* Optional section */
+        .optional-section {
+            margin-top: 30px;
+            text-align: center;
+            position: relative;
+            display: none; /* Hidden by default */
+            top: -60px; /* Move optional section up even more */
+        }
+        
+        .optional-text {
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            display: inline-block;
+            padding: 5px 10px;
+        }
+        
+        .optional-rectangle {
+            position: absolute;
+            background-color: rgba(10, 10, 10, 0.95);
+            height: 100%;
+            width: 100%;
+            z-index: -1;
+            left: 0;
+            top: 0;
+            transform: rotate(-1.3deg); /* rotate same amount but other way */
+        }
+        
+        /* Media query for desktop */
+        @media (min-width: 768px) {
+            .title-container {
+                margin-bottom: 40px;
+                top: 0;
+            }
+            
+            .mobile-title {
+                display: none;
+            }
+            
+            .desktop-title {
+                display: block;
+            }
+            
+            .title-line {
+                font-size: 3.5rem;
+                font-weight: 1000; /* Even bolder for desktop */
+            }
+            
+            .items-container {
+                max-width: 600px;
+                position: static;
+                top: 0;
+            }
+            
+            .item {
+                margin-bottom: 32px; /* Increased space between items */
+                position: relative;
+            }
+            
+            .item-text {
+                position: absolute;
+                left: 40px; /* Move texts further left (was 120px) */
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 2.2rem; /* Increased from 1.7rem */
+                min-width: 140px;   /* Less space for text */
+                text-align: left;
+                padding-right: 0;
+            }
+            
+            .item-hyphen {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 0; /* Remove extra horizontal padding for centering */
+            }
+            .item-image {
+                position: absolute;
+                left: calc(50% + 80px); /* Move images further right */
+                top: 50%;
+                transform: translateY(-50%);
+                margin: 0;
+                padding: 0;
+                width: 110px;   /* Bigger image */
+                height: 110px;
+                background: none;
+                border: none;
+                margin-right: 0;    /* Remove right padding for desktop */
+            }
+            
+            .divider {
+                position: relative; /* Changed from static */
+                top: 0; 
+                margin: 16px auto; /* Center horizontally with equal vertical spacing */
+            }
+            
+            .optional-text {
+                font-size: 1.3rem; /* Increased from 1rem */
+            }
+            
+            .optional-rectangle {
+                transform: rotate(1deg); /* rotate same amount but other way for desktop */
+            }
+            
+            .optional-section {
+                top: 0; /* Reset top position for desktop */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Title Section -->
+    <div class="title-container">
+        <!-- Mobile version (two lines) -->
+        <div class="mobile-title">
+            <span class="title-line">
+                Dom Według
+                <span class="title-rectangle"></span>
+            </span>
+            <span class="title-line">
+                Śmiechów
+                <span class="title-rectangle"></span>
+            </span>
+        </div>
+        
+        <!-- Desktop version (one line) -->
+        <div class="desktop-title">
+            <span class="title-line">
+                Dom Według Śmiechów
+                <span class="title-rectangle"></span>
+            </span>
+        </div>
+    </div>
+    
+    <!-- Items Section -->
+    <div class="items-container">
+        <div class="item">
+            <div class="item-text">Łazienka</div>
+            <div class="item-hyphen">–</div>
+            <img class="item-image" src="https://dummyimage.com/1920x1080/222/fff&text=F" alt="F">
+        </div>
+        
+        <div class="item">
+            <div class="item-text">Pranie</div>
+            <div class="item-hyphen">–</div>
+            <img class="item-image" src="https://dummyimage.com/1920x1080/222/fff&text=L" alt="L">
+        </div>
+        
+        <div class="item">
+            <div class="item-text">Parter</div>
+            <div class="item-hyphen">–</div>
+            <img class="item-image" src="https://dummyimage.com/1920x1080/222/fff&text=M" alt="M">
+        </div>
+    </div>
+    
+    <!-- Divider Line -->
+    <div class="divider"></div>
+    
+    <!-- Special Item (Deser) -->
+    <div class="items-container">
+        <div class="item special-item">
+            <div class="item-text">Deser</div>
+            <div class="item-hyphen">–</div>
+            <img class="item-image" src="https://dummyimage.com/1920x1080/222/fff&text=M" alt="M">
+        </div>
+    </div>
+    
+    <!-- Optional Section -->
+    <!-- Write text here to display this section -->
+    <div class="optional-section">
+        <span class="optional-text">
+            hejo florka, oddaj mi chipsy
+            <span class="optional-rectangle"></span>
+        </span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Original image assignments
+            const images = {
+                F: "https://dummyimage.com/1920x1080/222/fff&text=F",
+                L: "https://dummyimage.com/1920x1080/222/fff&text=L", 
+                M: "https://dummyimage.com/1920x1080/222/fff&text=M",
+                P: "https://dummyimage.com/1920x1080/222/fff&text=P",
+                T: "https://dummyimage.com/1920x1080/222/fff&text=T"
+            };
+            
+            // Rotation patterns - each represents where images F, L, M should be positioned
+            // Position order is [Łazienka, Pranie, Parter]
+            const rotationPatterns = [
+                ["L", "F", "M"],  // Week 0 (reference week): Sep 7, 2025
+                ["M", "L", "F"],  // Week 1: Sep 14, 2025
+                ["F", "M", "L"]   // Week 2: Sep 21, 2025
+            ];
+            
+            // Deser rotation (easy to change order)
+            // Week 0 (reference): P, then T, M, L, F, then repeat
+            const deserRotation = ["P", "T", "M", "L", "F"];
+
+            // Reference date: September 7th, 2025 (a Sunday)
+            const referenceDate = new Date('2025-09-07');
+            
+            // Get current date in Poland
+            const now = new Date();
+            const currentDate = new Date(now.toLocaleString("en-US", {timeZone: "Europe/Warsaw"}));
+            
+            // Calculate weeks difference
+            const millisecondsPerWeek = 7 * 24 * 60 * 60 * 1000;
+            const weeksDifference = Math.floor((currentDate - referenceDate) / millisecondsPerWeek);
+            
+            // Get current rotation pattern (add 3 and mod 3 to handle negative weeksDifference)
+            const patternIndex = ((weeksDifference % 3) + 3) % 3;
+            const currentPattern = rotationPatterns[patternIndex];
+
+            // Get current rotation for Deser
+            const deserIndex = ((weeksDifference % deserRotation.length) + deserRotation.length) % deserRotation.length;
+            const currentDeserLetter = deserRotation[deserIndex];
+
+            // Apply the current pattern
+            const imageElements = [
+                document.querySelector('.item:nth-of-type(1) .item-image'), // Łazienka
+                document.querySelector('.item:nth-of-type(2) .item-image'), // Pranie
+                document.querySelector('.item:nth-of-type(3) .item-image')  // Parter
+            ];
+            
+            // Set the images according to the pattern
+            for (let i = 0; i < 3; i++) {
+                imageElements[i].src = images[currentPattern[i]];
+                imageElements[i].alt = currentPattern[i];
+            }
+
+            // Set Deser image
+            const deserImage = document.querySelector('.special-item .item-image');
+            if (deserImage) {
+                deserImage.src = images[currentDeserLetter];
+                deserImage.alt = currentDeserLetter;
+            }
+
+            // Random rotation for images
+            const imageNodes = document.querySelectorAll('.item-image');
+            const isDesktop = window.innerWidth >= 768;
+
+            imageNodes.forEach(image => {
+                const randomRotation = Math.floor(Math.random() * 101) - 50; // -50 to 50 degrees
+                if (isDesktop) {
+                    image.style.transform = `translateY(-50%) rotate(${randomRotation}deg)`;
+                } else {
+                    image.style.transform = `rotate(${randomRotation}deg)`;
+                }
+            });
+            
+            const optionalText = document.querySelector('.optional-text');
+            if (optionalText.textContent.trim() !== '') {
+                document.querySelector('.optional-section').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
