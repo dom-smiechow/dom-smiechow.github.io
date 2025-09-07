@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dom Według Śmiechów</title>
+    <link rel="icon" href="icon.png" type="image/png">
     <style>
         /* Base styles */
         * {
@@ -30,31 +31,30 @@
             position: relative;
         }
         
-        /* Background texture */
+        /* Background texture - fixed approach with background-position animation */
         body::before {
             content: "";
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 200%; /* Larger than viewport to ensure no blank spaces */
-            height: 200%;
-            background-image: url('/waves.png');
+            top: -100%; /* Extend beyond viewport in all directions */
+            left: -100%;
+            width: 300%; /* Cover enough area to prevent empty spaces */
+            height: 300%;
+            background-image: url('waves.png');
             background-size: calc(5000px * var(--bg-scale)) calc(3333px * var(--bg-scale));
-            background-repeat: repeat; /* Tile in both directions to avoid blank spaces */
-            opacity: 0.15;
+            background-repeat: repeat;
+            opacity: 0.20;
             z-index: -1;
             pointer-events: none;
             animation: scrollBackground 120s linear infinite;
-            will-change: transform; /* Hint for browser to use GPU acceleration */
-            transform: translate3d(0, 0, 0); /* Initial position - force GPU acceleration */
+            will-change: background-position; /* Better performance hint for this animation */
         }
         
         @keyframes scrollBackground {
-            from {
-                transform: translate3d(0, 0, 0);
+            0% {
+                background-position: 100% 0%; /* Start at top-right */
             }
-            to {
-                transform: translate3d(-50%, 50%, 0); /* Move from top-right to bottom-left */
+            100% {
+                background-position: -100% 100%; /* Move further horizontally for faster horizontal movement */
             }
         }
         
@@ -283,9 +283,10 @@
                 top: 0; /* Reset top position for desktop */
             }
 
-            /* Change background tiling for desktop but keep animation direction */
+            /* Update desktop background sizing and make animation much slower */
             body::before {
-                background-size: calc(5000px * var(--bg-scale)) auto; /* Adjust for horizontal emphasis */
+                background-size: calc(5000px * var(--bg-scale)) auto;
+                animation: scrollBackground 600s linear infinite; /* Much slower - 10 minutes per cycle */
             }
         }
     </style>
@@ -351,13 +352,49 @@
     <!-- Write text here to display this section -->
     <div class="optional-section">
         <span class="optional-text">
-            hejo florka, oddaj mi chipsy
+            
             <span class="optional-rectangle"></span>
         </span>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Generate random HSV color and apply to background
+            function hsvToRgb(h, s, v) {
+                const c = v * s;
+                const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+                const m = v - c;
+                let r, g, b;
+
+                if (h >= 0 && h < 60) {
+                    r = c; g = x; b = 0;
+                } else if (h >= 60 && h < 120) {
+                    r = x; g = c; b = 0;
+                } else if (h >= 120 && h < 180) {
+                    r = 0; g = c; b = x;
+                } else if (h >= 180 && h < 240) {
+                    r = 0; g = x; b = c;
+                } else if (h >= 240 && h < 300) {
+                    r = x; g = 0; b = c;
+                } else {
+                    r = c; g = 0; b = x;
+                }
+
+                return [
+                    Math.round((r + m) * 255),
+                    Math.round((g + m) * 255),
+                    Math.round((b + m) * 255)
+                ];
+            }
+
+            // Generate random hue (0-360), fixed saturation and brightness
+            const randomHue = Math.floor(Math.random() * 360);
+            const saturation = 0.60; // 80%
+            const brightness = 0.40; // 65%
+            
+            const [r, g, b] = hsvToRgb(randomHue, saturation, brightness);
+            document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+
             // Original image assignments
             const images = {
                 F: "https://dummyimage.com/1920x1080/222/fff&text=F",
@@ -423,7 +460,7 @@
             const isDesktop = window.innerWidth >= 768;
 
             imageNodes.forEach(image => {
-                const randomRotation = Math.floor(Math.random() * 101) - 50; // -50 to 50 degrees
+                const randomRotation = Math.floor(Math.random() * 101) - 40; // -50 to 50 degrees
                 if (isDesktop) {
                     image.style.transform = `translateY(-50%) rotate(${randomRotation}deg)`;
                 } else {
