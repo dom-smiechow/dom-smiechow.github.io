@@ -394,7 +394,7 @@
             }
 
             const randomHue = Math.floor(Math.random() * 360);
-            const saturation = 1.3;
+            const saturation = 1.55;
             const lightness = 0.3;
             
             const [r, g, b] = okhslToRgb(randomHue, saturation, lightness);
@@ -426,7 +426,7 @@
             let currentDate = new Date(now.toLocaleString("en-US", {timeZone: "Europe/Warsaw"}));
             
             // testing date - remove later
-            // currentDate = new Date('2025-09-08');
+            currentDate = new Date('2025-09-05');
             
             const dayOfWeek = currentDate.getDay();
             const startOfWeek = new Date(currentDate);
@@ -531,3 +531,4 @@
     </script>
 </body>
 </html>
+
