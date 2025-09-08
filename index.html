@@ -418,6 +418,7 @@
                 document.querySelector('.optional-section').style.display = 'block';
             }
 
+
             // weekly random number
             const referenceDate = new Date('2024-01-07');
             
@@ -425,7 +426,7 @@
             let currentDate = new Date(now.toLocaleString("en-US", {timeZone: "Europe/Warsaw"}));
             
             // testing date - remove later
-            currentDate = new Date('2025-09-08');
+            // currentDate = new Date('2025-09-08');
             
             const dayOfWeek = currentDate.getDay();
             const startOfWeek = new Date(currentDate);
@@ -433,6 +434,27 @@
             
             const millisecondsPerWeek = 7 * 24 * 60 * 60 * 1000;
             const weeksSinceReference = Math.floor((startOfWeek - referenceDate) / millisecondsPerWeek);
+
+            //patterns
+            
+            const rotationPatterns = [
+                ["L", "F", "M"],  // Week 0 (reference week): Sep 7, 2025
+                ["M", "L", "F"],  // Week 1: Sep 14, 2025
+                ["F", "M", "L"]   // Week 2: Sep 21, 2025
+            ];
+            
+            // Deser rotation (easy to change order)
+            // Week 0 (reference): P, then T, M, L, F, then repeat
+            const deserRotation = ["P", "T", "M", "L", "F"];
+
+            const patternIndex = ((weeksSinceReference % 3) + 3) % 3;
+            const currentPattern = rotationPatterns[patternIndex];
+
+            // Get current rotation for Deser
+            const deserIndex = ((weeksSinceReference % deserRotation.length) + deserRotation.length) % deserRotation.length;
+            const currentDeserLetter = deserRotation[deserIndex];
+
+
             
             function seededRandom(seed) {
                 let x = Math.sin(seed * 9999) * 10000;
@@ -473,10 +495,14 @@
             ];
             
             const randArr = [rand1, rand2, rand3, rand4];
+            const letterToInt = { T, P, F, L, M };
 
             imageElements.forEach((img, idx) => {
-                const letter = indexToLetter[idx];
-                const letterToInt = { T, P, F, L, M };
+                if(idx < 3) {
+                    var letter = currentPattern[idx];
+                } else {
+                    var letter = currentDeserLetter;
+                }
                 const imageCount = letterToInt[letter];
                 if(imageCount == 0) {
                     img.src = `https://dummyimage.com/1920x1080/222/fff&text=${letter}`;
@@ -492,7 +518,8 @@
             });
             
             // show optional text
-            const optionalTextContent = `${rand1}, ${rand2}, ${rand3}, ${rand4}`;
+            //OPTIONAL TEXT
+            const optionalTextContent = ``;
             
             const optionalContentElement = document.getElementById('optional-content');
             optionalContentElement.textContent = optionalTextContent;
