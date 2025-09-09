@@ -40,7 +40,7 @@
             background-image: url('waves.png');
             background-size: calc(5000px * var(--bg-scale)) calc(3333px * var(--bg-scale));
             background-repeat: repeat;
-            opacity: 0.35;
+            opacity: 0.25;
             z-index: -1;
             mix-blend-mode: add;
             pointer-events: none;
@@ -395,7 +395,7 @@
             }
 
             const randomHue = Math.floor(Math.random() * 360);
-            const saturation = 1.55;
+            const saturation = 1.65;
             const lightness = 0.3;
             
             const [r, g, b] = okhslToRgb(randomHue, saturation, lightness);
@@ -477,7 +477,7 @@
             const T = 1;
             const P = 1;
             const F = 1;
-            const L = 0;
+            const L = -1;
             const M = 1;
 
             const indexToLetter = {
@@ -597,5 +597,6 @@
     </script>
 </body>
 </html>
+
 
 
