@@ -508,7 +508,7 @@
                 
                 if(imageCount === -1) {
                     // Fetch a random monkey image
-                    fetchRandomMonkeyImage(img, letter);
+                    img.src = `https://www.placemonkeys.com/300?random`;
                 } else if(imageCount == 0) {
                     img.src = `https://dummyimage.com/1920x1080/222/fff&text=${letter}`;
                     img.alt = letter;  
@@ -534,9 +534,6 @@
                 // Use placemonkeys.com with size 300 and random parameter to get different images
                 const imageUrl = `https://www.placemonkeys.com/300?random`;
                 
-                // Create a new image to load in background
-                const tempImg = new Image();
-                
                 tempImg.onload = function() {
                     // Update the image source
                     imgElement.src = tempImg.src;
@@ -561,6 +558,7 @@
     </script>
 </body>
 </html>
+
 
 
 
