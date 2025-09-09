@@ -508,7 +508,7 @@
                 
                 if(imageCount === -1) {
                     // Fetch a random monkey image
-                    img.src = `https://www.placemonkeys.com/300?random`;
+                    img.src = `https://www.placemonkeys.com/300?random=true`;
                 } else if(imageCount == 0) {
                     img.src = `https://dummyimage.com/1920x1080/222/fff&text=${letter}`;
                     img.alt = letter;  
@@ -522,27 +522,6 @@
                 }
             });
             
-            // Keep track of which image URLs we've already used this session
-            const usedMonkeyUrls = new Set();
-            
-            // Function to fetch and display a random monkey image
-            function fetchRandomMonkeyImage(imgElement, letter) {
-                // Show a placeholder while loading
-                imgElement.src = `https://dummyimage.com/300x300/222/fff&text=Loading...`;
-                imgElement.alt = `Loading monkey for ${letter}...`;
-                
-                // Use placemonkeys.com with size 300 and random parameter to get different images
-                const imageUrl = `https://www.placemonkeys.com/300?random`;
-                
-                tempImg.onload = function() {
-                    // Update the image source
-                    imgElement.src = tempImg.src;
-                    imgElement.alt = `Monkey`;
-                };
-                
-                // Start loading the image
-                tempImg.src = imageUrl;
-            }
             
             // show optional text
             //OPTIONAL TEXT
@@ -558,6 +537,7 @@
     </script>
 </body>
 </html>
+
 
 
 
