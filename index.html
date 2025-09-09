@@ -395,8 +395,8 @@
             }
 
             const randomHue = Math.floor(Math.random() * 360);
-            const saturation = 1.45;
-            const lightness = 0.4;
+            const saturation = 1.65;
+            const lightness = 0.45;
             
             const [r, g, b] = okhslToRgb(randomHue, saturation, lightness);
             document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
@@ -531,56 +531,20 @@
                 imgElement.src = `https://dummyimage.com/300x300/222/fff&text=Loading...`;
                 imgElement.alt = `Loading monkey for ${letter}...`;
                 
-                // Generate a unique query each time to avoid caching
-                const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
-                
-                // Create a random seed for the Unsplash API
-                const randomSeed = Math.floor(Math.random() * 1000);
-                
-                // Try different search terms to get variety
-                const monkeyTerms = ['monkey', 'ape', 'chimpanzee', 'gorilla', 'primate', 'baboon'];
-                const randomTerm = monkeyTerms[Math.floor(Math.random() * monkeyTerms.length)];
-                
-                // Unsplash Source API to get a random monkey image (no API key required)
-                const imageUrl = `https://source.unsplash.com/300x300/?${randomTerm}&random=${uniqueId}&seed=${randomSeed}`;
+                // Use placemonkeys.com with size 300 and random parameter to get different images
+                const imageUrl = `https://www.placemonkeys.com/300?random`;
                 
                 // Create a new image to load in background
                 const tempImg = new Image();
-                tempImg.crossOrigin = "anonymous";
                 
                 tempImg.onload = function() {
-                    // Check if this URL has been used before
-                    if (usedMonkeyUrls.has(tempImg.src)) {
-                        // Try again with a different random value
-                        fetchRandomMonkeyImage(imgElement, letter);
-                        return;
-                    }
-                    
                     // Update the image source
                     imgElement.src = tempImg.src;
-                    imgElement.alt = `Monkey ${letter}`;
-                    
-                    // Remember we used this URL
-                    usedMonkeyUrls.add(tempImg.src);
-                };
-                
-                tempImg.onerror = function() {
-                    // Fallback if image loading fails
-                    imgElement.src = `https://dummyimage.com/300x300/222/fff&text=${letter}`;
-                    imgElement.alt = `${letter} (failed to load monkey)`;
-                    console.error("Failed to load monkey image");
+                    imgElement.alt = `Monkey`;
                 };
                 
                 // Start loading the image
                 tempImg.src = imageUrl;
-                
-                // Set timeout to handle case where image never loads
-                setTimeout(() => {
-                    if (imgElement.src.includes('Loading')) {
-                        imgElement.src = `https://dummyimage.com/300x300/222/fff&text=${letter}`;
-                        imgElement.alt = `${letter} (timed out)`;
-                    }
-                }, 5000);
             }
             
             // show optional text
