@@ -40,7 +40,7 @@
             background-image: url('waves.png');
             background-size: calc(5000px * var(--bg-scale)) calc(3333px * var(--bg-scale));
             background-repeat: repeat;
-            opacity: 0.25;
+            opacity: 0.18;
             z-index: -1;
             mix-blend-mode: add;
             pointer-events: none;
@@ -396,7 +396,7 @@
 
             const randomHue = Math.floor(Math.random() * 360);
             const saturation = 1.65;
-            const lightness = 0.3;
+            const lightness = 0.45;
             
             const [r, g, b] = okhslToRgb(randomHue, saturation, lightness);
             document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
@@ -597,6 +597,7 @@
     </script>
 </body>
 </html>
+
 
 
 
