@@ -505,18 +505,83 @@
                     var letter = currentDeserLetter;
                 }
                 const imageCount = letterToInt[letter];
-                if(imageCount == 0) {
+                
+                if(imageCount === -1) {
+                    // Fetch a random monkey image
+                    fetchRandomMonkeyImage(img, letter);
+                } else if(imageCount == 0) {
                     img.src = `https://dummyimage.com/1920x1080/222/fff&text=${letter}`;
                     img.alt = letter;  
-                }else if(imageCount == 1){
+                } else if(imageCount == 1){
                     img.src = `${letter}/1.png`;
                     img.alt = `${letter}`;
-                }else if(imageCount > 1){
+                } else if(imageCount > 1){
                     const imageIndex = Math.floor(randArr[idx] * imageCount) + 1;
                     img.src = `${letter}/${imageIndex}.png`;
                     img.alt = `${letter}`;
                 }
             });
+            
+            // Keep track of which image URLs we've already used this session
+            const usedMonkeyUrls = new Set();
+            
+            // Function to fetch and display a random monkey image
+            function fetchRandomMonkeyImage(imgElement, letter) {
+                // Show a placeholder while loading
+                imgElement.src = `https://dummyimage.com/300x300/222/fff&text=Loading...`;
+                imgElement.alt = `Loading monkey for ${letter}...`;
+                
+                // Generate a unique query each time to avoid caching
+                const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+                
+                // Create a random seed for the Unsplash API
+                const randomSeed = Math.floor(Math.random() * 1000);
+                
+                // Try different search terms to get variety
+                const monkeyTerms = ['monkey', 'ape', 'chimpanzee', 'gorilla', 'primate', 'baboon'];
+                const randomTerm = monkeyTerms[Math.floor(Math.random() * monkeyTerms.length)];
+                
+                // Unsplash Source API to get a random monkey image (no API key required)
+                const imageUrl = `https://source.unsplash.com/300x300/?${randomTerm}&random=${uniqueId}&seed=${randomSeed}`;
+                
+                // Create a new image to load in background
+                const tempImg = new Image();
+                tempImg.crossOrigin = "anonymous";
+                
+                tempImg.onload = function() {
+                    // Check if this URL has been used before
+                    if (usedMonkeyUrls.has(tempImg.src)) {
+                        // Try again with a different random value
+                        fetchRandomMonkeyImage(imgElement, letter);
+                        return;
+                    }
+                    
+                    // Update the image source
+                    imgElement.src = tempImg.src;
+                    imgElement.alt = `Monkey ${letter}`;
+                    
+                    // Remember we used this URL
+                    usedMonkeyUrls.add(tempImg.src);
+                };
+                
+                tempImg.onerror = function() {
+                    // Fallback if image loading fails
+                    imgElement.src = `https://dummyimage.com/300x300/222/fff&text=${letter}`;
+                    imgElement.alt = `${letter} (failed to load monkey)`;
+                    console.error("Failed to load monkey image");
+                };
+                
+                // Start loading the image
+                tempImg.src = imageUrl;
+                
+                // Set timeout to handle case where image never loads
+                setTimeout(() => {
+                    if (imgElement.src.includes('Loading')) {
+                        imgElement.src = `https://dummyimage.com/300x300/222/fff&text=${letter}`;
+                        imgElement.alt = `${letter} (timed out)`;
+                    }
+                }, 5000);
+            }
             
             // show optional text
             //OPTIONAL TEXT
@@ -532,6 +597,5 @@
     </script>
 </body>
 </html>
-
 
 
