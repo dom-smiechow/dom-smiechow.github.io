@@ -427,11 +427,12 @@
             let currentDate = new Date(now.toLocaleString("en-US", {timeZone: "Europe/Warsaw"}));
             
             // testing date - remove later
-            // currentDate = new Date('2025-09-18');
+            currentDate = new Date('2025-09-15');
             
             const dayOfWeek = currentDate.getDay();
             const startOfWeek = new Date(currentDate);
-            startOfWeek.setDate(currentDate.getDate() - dayOfWeek);
+            const daysFromMonday = (dayOfWeek + 6) % 7;
+            startOfWeek.setDate(currentDate.getDate() - daysFromMonday);
             
             const millisecondsPerWeek = 7 * 24 * 60 * 60 * 1000;
             const weeksSinceReference = Math.floor((startOfWeek - referenceDate) / millisecondsPerWeek);
@@ -538,7 +539,6 @@
     </script>
 </body>
 </html>
-
 
 
 
