@@ -447,7 +447,7 @@
             
             // Deser rotation (easy to change order)
             // Week 0 (reference): P, then T, M, L, F, then repeat
-            const deserRotation = ["T", "M", "L", "F", "P"];
+            const deserRotation = ["P", "T", "M", "L", "F"];
 
             const patternIndex = ((weeksSinceReference % 3) + 3) % 3;
             const currentPattern = rotationPatterns[patternIndex];
@@ -539,6 +539,7 @@
     </script>
 </body>
 </html>
+
 
 
 
